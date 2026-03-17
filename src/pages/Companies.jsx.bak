@@ -1,0 +1,212 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { collection, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { api } from '../services/api';
+import DataTable from '../components/tables/DataTable';
+import Modal from '../components/modals/Modal';
+import AddCompanyForm from '../components/Forms/AddCompanyForm';
+import Notification from '../components/widgets/Notification';
+import { PlusIcon } from '@heroicons/react/24/outline';
+
+const Companies = () => {
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCompany, setEditingCompany] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+  const navigate = useNavigate();
+
+  const companyColumns = [
+    { key: 'name', label: 'Company Name' },
+    { key: 'contactPerson', label: 'Contact Person' },
+    { key: 'phone', label: 'Phone' },
+    { key: 'email', label: 'Email' },
+    { key: 'city', label: 'City' },
+    { key: 'state', label: 'State' },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (_, item) => (
+        <div className="flex items-center space-x-3">
+          <button 
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md group hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 hover:shadow-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEditClick(item);
+            }}
+          >
+            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit</span>
+            <span className="absolute inset-0 w-full h-full rounded-md bg-blue-700 opacity-0 group-hover:opacity-20 transition-opacity duration-200"></span>
+          </button>
+          <button 
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md group hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 hover:shadow-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteClick(item);
+            }}
+          >
+            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            <span>Remove</span>
+            <span className="absolute inset-0 w-full h-full rounded-md bg-red-700 opacity-0 group-hover:opacity-20 transition-opacity duration-200"></span>
+          </button>
+        </div>
+      )
+    }
+  ];
+
+  // Fetch companies in real-time
+  useEffect(() => {
+    const companiesRef = collection(db, 'companies');
+    const q = query(companiesRef, orderBy('createdAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, 
+      (querySnapshot) => {
+        const companyData = [];
+        querySnapshot.forEach((doc) => {
+          companyData.push({ id: doc.id, ...doc.data() });
+        });
+        setCompanies(companyData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching companies:', error);
+        setNotification({ 
+          show: true, 
+          message: 'Error loading companies: ' + error.message, 
+          type: 'error' 
+        });
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleAddCompany = async (newCompany) => {
+    try {
+      if (editingCompany) {
+        // Update existing company
+        await api.updateCompany(editingCompany.id, newCompany);
+        setNotification({ 
+          show: true, 
+          message: 'Company updated successfully!', 
+          type: 'success' 
+        });
+        setIsEditModalOpen(false);
+      } else {
+        // Add new company
+        await api.addCompany(newCompany);
+        setIsModalOpen(false);
+        setNotification({ 
+          show: true, 
+          message: 'Company added successfully!', 
+          type: 'success' 
+        });
+      }
+      
+      // Reset form and editing state
+      setEditingCompany(null);
+    } catch (error) {
+      console.error('Error saving company:', error);
+      setNotification({ 
+        show: true, 
+        message: `Failed to ${editingCompany ? 'update' : 'add'} company: ` + error.message, 
+        type: 'error' 
+      });
+    }
+  };
+
+  const handleEditClick = (company) => {
+    setEditingCompany(company);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = async (company) => {
+    if (window.confirm(`Are you sure you want to delete ${company.name}?`)) {
+      try {
+        await api.deleteCompany(company.id);
+        setNotification({ 
+          show: true, 
+          message: 'Company deleted successfully!', 
+          type: 'success' 
+        });
+      } catch (error) {
+        console.error('Error deleting company:', error);
+        setNotification({ 
+          show: true, 
+          message: 'Failed to delete company: ' + error.message, 
+          type: 'error' 
+        });
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setIsEditModalOpen(false);
+    setEditingCompany(null);
+  };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64">Loading...</div>;
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Companies</h1>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+          Add Company
+        </button>
+      </div>
+
+      <DataTable
+        data={companies}
+        columns={companyColumns}
+        title="Company Directory"
+        searchable={true}
+        sortable={true}
+        pagination={true}
+        itemsPerPage={10}
+      />
+
+      {/* Add Company Modal */}
+      <Modal isOpen={isModalOpen} onClose={handleCancel} title="Add New Company">
+        <AddCompanyForm 
+          onAdd={handleAddCompany} 
+          onCancel={handleCancel} 
+        />
+      </Modal>
+
+      {/* Edit Company Modal */}
+      <Modal isOpen={isEditModalOpen} onClose={handleCancel} title="Edit Company">
+        <AddCompanyForm 
+          onAdd={handleAddCompany} 
+          onCancel={handleCancel} 
+          initialData={editingCompany}
+        />
+      </Modal>
+
+      {notification.show && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification({ show: false, message: '', type: '' })}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Companies;
