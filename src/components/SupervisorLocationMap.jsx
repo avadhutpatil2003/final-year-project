@@ -15,8 +15,8 @@ L.Icon.Default.mergeOptions({
 });
 
 // Google Maps API Key from environment variable
-const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'AIzaSyBPjvI0ctJBNDWqvKZ5CJcmtgCnZiqkyJQ';
-const USE_GOOGLE_MAPS = !!GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== 'YOUR_GOOGLE_MAPS_API_KEY_HERE';
+const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '';
+const USE_GOOGLE_MAPS = !!GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== '';
 
 // Debug log
 console.log('🔑 Google Maps API Key:', GOOGLE_MAPS_API_KEY ? 'Found' : 'Not found');
@@ -138,7 +138,7 @@ const SupervisorLocationMap = ({ supervisorEmail, live = true }) => {
   // Helper function to get address from coordinates using Google Geocoding API
   const getAddressFromCoordinates = async (latitude, longitude) => {
     try {
-      if (!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
+      if (!USE_GOOGLE_MAPS) {
         return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
       }
 

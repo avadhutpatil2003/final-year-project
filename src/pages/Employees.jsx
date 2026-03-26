@@ -6,10 +6,7 @@ import {
   TrashIcon,
   UserPlusIcon,
   UsersIcon,
-  UserGroupIcon,
   EyeIcon,
-  ClockIcon,
-  CalendarIcon,
   PrinterIcon,
   ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
@@ -71,7 +68,18 @@ export default function Employees() {
       },
       (error) => {
         console.error('❌ Error fetching employees:', error);
-        setError(error.message);
+        
+        // Handle permission errors
+        if (error.code === 'permission-denied') {
+          console.warn('⚠️ Firestore Rules issue detected.');
+          console.warn('📝 Fix: Update Firestore Rules in Firebase Console');
+          console.warn('📖 Guide: See FIRESTORE_RULES_DEPLOYMENT.md');
+          setError('Permission Denied - Update Firestore Rules (see console)');
+          setEmployees([]);
+        } else {
+          setError(error.message);
+        }
+        
         setLoading(false);
         setNotification({
           show: true,

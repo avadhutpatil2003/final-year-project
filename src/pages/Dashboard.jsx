@@ -3,37 +3,27 @@ import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import StatCard from "../components/CardStats/StatCard";
 import DataTable from "../components/Table/DataTable";
-import StatusBadge from "../components/widgets/StatusBadge";
 import AnimatedCounter from "../components/widgets/AnimatedCounter";
 import useRealTimeData from "../hooks/useRealTimeData";
 import SupervisorLocationMap from "../components/SupervisorLocationMap";
 import {
-  UsersIcon,
-  ClockIcon,
-  CalendarDaysIcon,
-  ExclamationTriangleIcon,
-  ShieldCheckIcon,
-  ChartBarIcon,
-  PlayIcon,
-  PauseIcon,
   BuildingOfficeIcon,
   UserGroupIcon,
   CheckCircleIcon,
   XCircleIcon,
   MapPinIcon,
 } from "@heroicons/react/24/outline";
-import { api } from "../services/api";
 
 const Dashboard = () => {
-  const [recentCompanies, setRecentCompanies] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
   const [selectedSupervisor, setSelectedSupervisor] = useState("");
-  const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState(new Date());
   const [selectedSummary, setSelectedSummary] = useState(null);
+  const [recentCompanies, setRecentCompanies] = useState([]);
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
   // Memoize initial data to prevent infinite re-renders
   const initialStatsData = useMemo(() => ({
@@ -60,8 +50,6 @@ const Dashboard = () => {
   // Real-time data hooks (keeping for other stats)
   const {
     data: stats,
-    isLive: statsLive,
-    toggleLive: toggleStatsLive,
   } = useRealTimeData(initialStatsData, 5000);
 
   useEffect(() => {

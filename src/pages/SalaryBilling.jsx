@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdvance } from "../contexts/AdvanceContext";
 import {
@@ -12,7 +12,6 @@ import {
   PrinterIcon,
   DocumentArrowDownIcon,
   UsersIcon,
-  ClockIcon,
   PencilIcon
 } from "@heroicons/react/24/outline";
 import { db } from "../firebase";
@@ -21,7 +20,6 @@ import {
   query,
   where,
   getDocs,
-  addDoc,
   doc,
   getDoc,
   updateDoc,

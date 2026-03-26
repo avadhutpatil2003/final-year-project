@@ -20,7 +20,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { companyData } from '../../data/companyData';
-import jmsLogo from '../../assets/logos/Logo.jpeg';
+import jmsLogo from '../../assets/logos/AP logo.jpg';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { user, logout } = useAuth();
@@ -73,7 +73,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             className="h-12 w-auto object-contain"
           />
           <div className="ml-3 flex-1">
-            <div className="text-base font-bold text-gray-900 dark:text-white">Jay Maharashtra</div>
+            <div className="text-base font-bold text-gray-900 dark:text-white">AP</div>
             <div className="text-base font-bold text-gray-900 dark:text-white">Security Services</div>
           </div>
         </div>

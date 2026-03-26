@@ -196,6 +196,17 @@ export const NotificationProvider = ({ children }) => {
             console.log('✅ Notifications updated:', notificationsList.length, 'total,', unread, 'unread');
         }, (error) => {
             console.error('❌ Error in notification listener:', error);
+            
+            // Handle permission errors gracefully
+            if (error.code === 'permission-denied') {
+                console.warn('⚠️ Firestore Rules issue detected.');
+                console.warn('📝 Fix: Update Firestore Rules in Firebase Console');
+                console.warn('📖 Guide: See FIRESTORE_RULES_DEPLOYMENT.md');
+                
+                // Set empty notifications to prevent app crash
+                setNotifications([]);
+                setUnreadCount(0);
+            }
         });
 
         // Cleanup function - unsubscribe when component unmounts

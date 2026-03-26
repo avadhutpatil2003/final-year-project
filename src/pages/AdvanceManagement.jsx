@@ -3,10 +3,8 @@ import { collection, addDoc, getDocs, Timestamp, setDoc, doc } from 'firebase/fi
 import { db } from '../firebase';
 import {
   BanknotesIcon,
-  PlusIcon,
   CalendarIcon,
   UserIcon,
-  ClockIcon,
   CheckCircleIcon,
   XMarkIcon,
   DocumentTextIcon

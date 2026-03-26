@@ -6,9 +6,9 @@ export const companyData = {
   "jms-group": {
     id: "jms-group",
     name: "JMS Group",
-    fullName: "JMS Group ",
+    fullName: "AP Group ",
     address:
-      "C.S.No 942/2 plot no 01,Miraj Kupwad road Dwaraka Nagar MIDC Miraj Dist Sangli MH 416410.",
+      "Islampur ",
     phone: "+91 9028039821",
     email: "securejms@yahoo.com",
     logo: jmsLogo,
@@ -20,9 +20,9 @@ export const companyData = {
   "jay-maharashtra-security": {
     id: "jay-maharashtra-security",
     name: "Jay Maharashtra Security",
-    fullName: "Jay Maharashtra Security Services ",
+    fullName: "AP Security Services ",
     address:
-      "C.S.No 942/2 plot no 01,Miraj Kupwad road Dwaraka Nagar MIDC Miraj Dist Sangli MH 416410.",
+      "Islampur",
     phone: "+91 9028039821",
     email: "securejms@yahoo.com",
     logo: jmsLogo,
