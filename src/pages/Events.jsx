@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy, writeBatch, setDoc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, updateDoc, query, orderBy, writeBatch, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { 
   CalendarIcon, 
   TrashIcon,
-  PencilIcon,
   MapPinIcon,
   ClockIcon,
   UsersIcon,
-  CheckCircleIcon,
   XCircleIcon
 } from '@heroicons/react/24/outline';
 import Modal from '../components/Modal/Modal';
@@ -234,25 +232,7 @@ export default function Events() {
     }
   };
 
-  const handleEdit = (event) => {
-    setEditingEvent(event);
-    setFormData({
-      eventName: event.eventName,
-      eventDate: event.eventDate,
-      startTime: event.startTime || '',
-      endTime: event.endTime || '',
-      workingHours: event.workingHours || '',
-      location: event.location,
-      selectedEmployees: event.selectedEmployees || [],
-      paymentStatus: event.paymentStatus || 'pending',
-      manualEmployees: (event.manualEmployees || []).map(emp => ({
-        ...emp,
-        isSelected: true
-      }))
-    });
-    // Scroll to form
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+
 
   const handleDelete = async (eventId) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
@@ -357,33 +337,7 @@ export default function Events() {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'upcoming':
-        return 'bg-blue-100 text-blue-800';
-      case 'ongoing':
-        return 'bg-green-100 text-green-800';
-      case 'completed':
-        return 'bg-gray-100 text-gray-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
-  const getPaymentStatusColor = (status) => {
-    switch (status) {
-      case 'paid':
-        return 'text-green-600';
-      case 'pending':
-        return 'text-orange-600';
-      case 'not_required':
-        return 'text-gray-600';
-      default:
-        return 'text-gray-600';
-    }
-  };
 
   return (
     <div className="p-6 space-y-6">

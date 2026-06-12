@@ -1,11 +1,5 @@
 import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc, 
-  arrayUnion, 
-  getDocs, 
-  collection 
+  getDoc 
 } from "firebase/firestore";
 
 // Utility function to handle Firestore operations with retry logic

@@ -5,14 +5,12 @@ import StatCard from "../components/CardStats/StatCard";
 import DataTable from "../components/Table/DataTable";
 import AnimatedCounter from "../components/widgets/AnimatedCounter";
 import useRealTimeData from "../hooks/useRealTimeData";
-import SupervisorLocationMap from "../components/SupervisorLocationMap";
 import { useNavigate } from "react-router-dom";
 import {
   BuildingOfficeIcon,
   UserGroupIcon,
   CheckCircleIcon,
   XCircleIcon,
-  MapPinIcon,
   DocumentTextIcon,
   BanknotesIcon,
   BriefcaseIcon
@@ -22,13 +20,10 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [companies, setCompanies] = useState([]);
-  const [supervisors, setSupervisors] = useState([]);
-  const [selectedSupervisor, setSelectedSupervisor] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedSummary, setSelectedSummary] = useState(null);
   const [recentCompanies, setRecentCompanies] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
-  const [lastUpdated, setLastUpdated] = useState(new Date());
 
   // Memoize initial data to prevent infinite re-renders
   const initialStatsData = useMemo(() => ({
@@ -151,22 +146,7 @@ const Dashboard = () => {
           }
         );
 
-        // Fetch supervisors
-        const supervisorsRef = collection(db, "supervisors");
-        const supervisorsQuery = query(
-          supervisorsRef,
-          orderBy("createdAt", "desc")
-        );
-        const unsubscribeSupervisors = onSnapshot(
-          supervisorsQuery,
-          (querySnapshot) => {
-            const supervisorData = [];
-            querySnapshot.forEach((doc) => {
-              supervisorData.push({ id: doc.id, ...doc.data() });
-            });
-            setSupervisors(supervisorData);
-          }
-        );
+
 
         // Fetch attendance data with real-time updates
         const attendanceRef = collection(db, "attendance");
@@ -240,7 +220,6 @@ const Dashboard = () => {
         return () => {
           unsubscribeEmployees();
           unsubscribeCompanies();
-          unsubscribeSupervisors();
           unsubscribeAttendance();
         };
       } catch (error) {
@@ -253,10 +232,7 @@ const Dashboard = () => {
     setLoading(false);
   }, []);
 
-  // Update timestamp when data changes
-  useEffect(() => {
-    setLastUpdated(new Date());
-  }, [stats]);
+
 
   // Calculate attendance statistics
   const getAttendanceStats = () => {

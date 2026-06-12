@@ -893,10 +893,4 @@ export default function Employees() {
   );
 }
 
-// 🔹 Helper Component
-const Info = ({ label, value }) => (
-  <div>
-    <p className="text-sm font-medium text-gray-700">{label}</p>
-    <p className="text-gray-900">{value || 'N/A'}</p>
-  </div>
-);
+

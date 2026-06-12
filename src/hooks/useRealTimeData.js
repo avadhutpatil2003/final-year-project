@@ -5,8 +5,7 @@ const useRealTimeData = (initialData, updateInterval = 5000) => {
   const [isLive, setIsLive] = useState(true);
 
   const generateRandomUpdate = useCallback(() => {
-    const variation = () => Math.random() * 0.2 - 0.1; // ±10% variation
-    
+
     return {
       totalCompanies: Math.max(40, Math.floor(45 + (Math.random() * 10 - 5))),
       activeCompanies: Math.max(25, Math.floor(32 + (Math.random() * 8 - 4))),

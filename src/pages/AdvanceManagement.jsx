@@ -5,8 +5,6 @@ import {
   BanknotesIcon,
   CalendarIcon,
   UserIcon,
-  CheckCircleIcon,
-  XMarkIcon,
   DocumentTextIcon
 } from '@heroicons/react/24/outline';
 import DataTable from '../components/Table/DataTable';

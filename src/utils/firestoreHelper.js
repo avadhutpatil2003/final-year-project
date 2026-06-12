@@ -5,7 +5,6 @@ import {
   doc, 
   updateDoc, 
   deleteDoc,
-  Timestamp,
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -260,7 +259,7 @@ export const validateAndSave = async (collectionName, data, schema) => {
   }
 };
 
-export default {
+const firestoreHelper = {
   addFirestoreData,
   setFirestoreData,
   updateFirestoreData,
@@ -269,3 +268,5 @@ export default {
   saveWithRetry,
   validateAndSave
 };
+
+export default firestoreHelper;

@@ -134,42 +134,7 @@ export default function Companies() {
     return Math.round(dayWiseSalary / hours);
   };
 
-  // 🔹 Update all existing companies with day-wise salary
-  const updateAllCompaniesWithDayWiseSalary = async () => {
-    try {
-      setNotification({ 
-        show: true, 
-        message: 'Updating all companies with day-wise salary...', 
-        type: 'info' 
-      });
 
-      const updatePromises = companies.map(async (company) => {
-        if (company.employeeSalary && !company.dayWiseSalary) {
-          const dayWiseSalary = calculateDayWiseSalary(parseFloat(company.employeeSalary));
-          return api.updateCompany(company.id, {
-            ...company,
-            dayWiseSalary: dayWiseSalary
-          });
-        }
-        return Promise.resolve();
-      });
-
-      await Promise.all(updatePromises);
-      
-      setNotification({ 
-        show: true, 
-        message: 'All companies updated with day-wise salary successfully!', 
-        type: 'success' 
-      });
-    } catch (error) {
-      console.error('Error updating companies:', error);
-      setNotification({ 
-        show: true, 
-        message: 'Error updating companies: ' + error.message, 
-        type: 'error' 
-      });
-    }
-  };
 
   const handleAddCompany = async (newCompany) => {
     try {

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { AdvanceProvider, useAdvance } from './contexts/AdvanceContext';
+import { AdvanceProvider } from './contexts/AdvanceContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import Sidebar from './components/Sidebar/Sidebar';
 import Navbar from './components/Navbar/Navbar';
@@ -16,7 +16,6 @@ import MarkAttendance from './pages/MarkAttendance';
 // import Forms from './pages/Forms';
 import Settings from './pages/Settings';
 import SalaryBilling from './pages/SalaryBilling';
-import SalaryBillingDiagnostic from './pages/SalaryBillingDiagnostic';
 import SalaryReports from './pages/SalaryReports';
 import ErrorBoundary from './components/ErrorBoundary';
 import BillingPage from "./pages/BillingPage";
@@ -27,11 +26,6 @@ import AdminLogin from './pages/AdminLogin';
 import Register from './pages/Register';
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
 
   return (
     <AuthProvider>
@@ -67,7 +61,7 @@ const ProtectedRoute = ({ children }) => {
 // Main App Routes Component
 const AppRoutes = () => {
   const { user } = useAuth();
-  const { advanceData } = useAdvance();
+
 
   return (
     <Routes>

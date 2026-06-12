@@ -8,7 +8,6 @@ import {
   setDoc,
   updateDoc,
   addDoc,
-  deleteDoc,
   query,
   orderBy,
   onSnapshot,
@@ -26,7 +25,7 @@ const IssueItems = () => {
   const [itemsList, setItemsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedEmployeeName, setSelectedEmployeeName] = useState("");
+
   const [editingItem, setEditingItem] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [employeeItemCosts, setEmployeeItemCosts] = useState({});
@@ -111,7 +110,7 @@ const IssueItems = () => {
     fetchItemsList();
     fetchIssuedData();
 
-    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 🔹 Fetch issued items from Firestore
@@ -242,7 +241,6 @@ const IssueItems = () => {
     await fetchIssuedData();
     setSelectedItems([]);
     setSelectedEmployee("");
-    setSelectedEmployeeName("");
     setSearchTerm("");
     setLoading(false);
     alert(`✅ ${emp.name} ला आयटम दिले गेले!`);
@@ -370,7 +368,7 @@ const IssueItems = () => {
             setShowDropdown(true);
             if (e.target.value === "") {
               setSelectedEmployee("");
-              setSelectedEmployeeName("");
+
             }
           }}
           onFocus={() => setShowDropdown(true)}
@@ -390,7 +388,6 @@ const IssueItems = () => {
                   className="px-4 py-2 hover:bg-blue-100 cursor-pointer border-b border-gray-100"
                   onClick={() => {
                     setSelectedEmployee(employee.id);
-                    setSelectedEmployeeName(employee.name);
                     setSearchTerm(employee.name);
                     setShowDropdown(false);
                   }}

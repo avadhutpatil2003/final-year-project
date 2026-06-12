@@ -37,7 +37,7 @@ export const AdvanceProvider = ({ children }) => {
     advanceData: deductionData,
     updateAdvanceData,
     clearAdvanceData,
-  }), [deductionData, updateDeductionData, clearDeductionData]);
+  }), [deductionData, updateDeductionData, clearDeductionData, updateAdvanceData, clearAdvanceData]);
 
   return (
     <AdvanceContext.Provider value={value}>
