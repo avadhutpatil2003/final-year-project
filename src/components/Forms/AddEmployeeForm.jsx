@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Input from "./Input";
-import FileUpload from "./FileUpload";
 import {
   UserIcon,
   CakeIcon,
@@ -100,9 +99,6 @@ const AddEmployeeForm = ({ onAdd, onCancel, initialData }) => {
     }));
   };
 
-  const handleFileChange = (file) => {
-    setFormData((prev) => ({ ...prev, photo: file }));
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

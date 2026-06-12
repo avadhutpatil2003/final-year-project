@@ -28,6 +28,7 @@ const BillingPage = () => {
 
   useEffect(() => {
     if (selectedEmployee && selectedMonth) calculateSalary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEmployee, selectedMonth]);
 
   const calculateSalary = async () => {

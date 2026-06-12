@@ -26,7 +26,7 @@ const AddSalaryForm = ({ onAdd, onCancel, initialData }) => {
   });
   const [employees, setEmployees] = useState([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
-  const [loading, setLoading] = useState(false);
+
 
   // Fetch employees from Firebase
   useEffect(() => {

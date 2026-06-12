@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CurrencyDollarIcon, UserIcon, EyeIcon, XMarkIcon, PrinterIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
-import { collection, query, getDocs, where, doc, updateDoc } from "firebase/firestore";
+import { CurrencyDollarIcon, EyeIcon, XMarkIcon, PrinterIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import api from "../services/api";
 import DataTable from "../components/Table/DataTable";
@@ -87,63 +87,7 @@ const SalaryReports = () => {
     return { esiNumber, pfNumber };
   };
 
-  const calculateAttendanceForEmployee = async (employeeId, employeeName, monthName, year) => {
-    try {
-      // Create date range for the month
-      const monthIndex = new Date(`${monthName} 1, ${year}`).getMonth();
-      const startDate = new Date(year, monthIndex, 1);
-      const endDate = new Date(year, monthIndex + 1, 0); // Last day of month
 
-      // Query attendance records for this employee in this month
-      const attendanceRef = collection(db, "attendance");
-      const attendanceQuery = query(
-        attendanceRef,
-        where("employeeId", "==", employeeId)
-      );
-
-      const attendanceSnapshot = await getDocs(attendanceQuery);
-      let presentDays = 0;
-
-      attendanceSnapshot.forEach((doc) => {
-        const attendanceData = doc.data();
-        if (attendanceData.date && attendanceData.date.toDate) {
-          const attendanceDate = attendanceData.date.toDate();
-
-          // Check if attendance is within the salary month
-          if (attendanceDate >= startDate && attendanceDate <= endDate) {
-            if (attendanceData.status === 'present' || attendanceData.checkIn) {
-              presentDays++;
-            }
-          }
-        }
-      });
-
-      // Calculate total working days in month (excluding Sundays)
-      const totalDays = endDate.getDate();
-      let workingDays = 0;
-      for (let day = 1; day <= totalDays; day++) {
-        const date = new Date(year, monthIndex, day);
-        if (date.getDay() !== 0) { // 0 = Sunday
-          workingDays++;
-        }
-      }
-
-      const absentDays = workingDays - presentDays;
-
-      return {
-        presentDays: Math.max(0, presentDays),
-        absentDays: Math.max(0, absentDays),
-        totalWorkingDays: workingDays
-      };
-    } catch (error) {
-      console.error("Error calculating attendance:", error);
-      return {
-        presentDays: 0,
-        absentDays: 0,
-        totalWorkingDays: 0
-      };
-    }
-  };
 
   const fetchReports = async () => {
     try {
@@ -371,25 +315,7 @@ const SalaryReports = () => {
     setSelectedEmployeeName("");
   };
 
-  const printAllSalarySlips = () => {
-    if (selectedEmployeeReports.length === 0) return;
 
-    const doc = new jsPDF();
-    let isFirstPage = true;
-
-    selectedEmployeeReports.forEach((report, index) => {
-      if (!isFirstPage) {
-        doc.addPage();
-      }
-
-      // Generate PDF content for each report
-      generateSalarySlipContent(doc, report);
-      isFirstPage = false;
-    });
-
-    // Save the combined PDF
-    doc.save(`${selectedEmployeeName}_All_Salary_Slips.pdf`);
-  };
 
   const printSingleSalarySlip = (report) => {
     const { esiNumber, pfNumber } = getEmployeeComplianceNumbers(report);
@@ -733,137 +659,6 @@ const SalaryReports = () => {
     return startY + boxHeight + 5;
   };
 
-  const generateSalarySlipContent = async (doc, report) => {
-    // Get company information
-    const companyInfo = report.companyInfo;
-
-    // Company Header (same idea as generatePDF)
-    if (companyInfo) {
-      // Logo on left side
-      if (companyInfo.logo) {
-        try {
-          const logoBase64 = await getImageAsBase64(companyInfo.logo);
-          if (logoBase64) {
-            doc.addImage(logoBase64, 'PNG', 20, 5, 30, 15);
-          } else {
-            // Fallback small text if image fails
-            doc.setFontSize(8);
-            doc.setFont("helvetica", "italic");
-            doc.text("[Company Logo]", 35, 15, null, null, "center");
-          }
-        } catch (error) {
-          console.error('Error loading logo:', error);
-          // Fallback small text if exception
-          doc.setFontSize(8);
-          doc.setFont("helvetica", "italic");
-          doc.text("[Company Logo]", 35, 15, null, null, "center");
-        }
-
-        // Company info positioned to the right of logo
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "bold");
-        doc.text(companyInfo.fullName, 60, 12, null, null, "left");
-
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text(companyInfo.address, 60, 19, null, null, "left");
-        doc.text(`Phone: ${companyInfo.phone} | Email: ${companyInfo.email}`, 60, 25, null, null, "left");
-      } else {
-        // Center layout when no logo
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "bold");
-        doc.text(companyInfo.fullName, 105, 15, null, null, "center");
-
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text(companyInfo.address, 105, 22, null, null, "center");
-        doc.text(`Phone: ${companyInfo.phone} | Email: ${companyInfo.email}`, 105, 28, null, null, "center");
-      }
-    } else {
-      // Fallback title
-      doc.setFontSize(20);
-      doc.setFont("helvetica", "bold");
-      doc.text("Salary Slip Format", 105, 20, null, null, "center");
-    }
-
-    // Main Salary Slip Header
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("Salary Slip", 105, 43, null, null, "center");
-
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Generated Date: ${new Date(report.generatedDate).toLocaleDateString()}`, 105, 55, null, null, "center");
-
-    const complianceInfo = getEmployeeComplianceNumbers(report);
-    let yPos = drawEmployeeInfoSection(doc, 65, report, complianceInfo);
-
-    // Manual Table Creation (Earnings and Deductions)
-
-    // Table Header
-
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("Earnings", 37.5, yPos + 5, null, null, "center");
-    doc.text("Amount", 82.5, yPos + 5, null, null, "center");
-    doc.text("Deductions", 127.5, yPos + 5, null, null, "center");
-    doc.text("Amount", 172.5, yPos + 5, null, null, "center");
-
-    // Table Rows
-    const tableData = [
-      ['Basic', `₹${report.basicSalary || 0}`, 'Provident Fund', '₹0'],
-      ['HRA', '₹0', 'ESI', '₹0'],
-      ['Special Allowance', `₹${report.allowances || 0}`, 'Professional Tax', '₹0'],
-      ['Gross Salary', `₹${(parseFloat(report.basicSalary || 0) + parseFloat(report.allowances || 0)).toFixed(2)}`, 'Salary Advance', '₹0'],
-      ['Other Earnings', '₹0', 'TDS', '₹0'],
-      ['Incentives', '₹0', 'Other Deduction', `₹${getDeductionAmount(report.deductions).toFixed(2)}`],
-      ['Bonus', '₹0', '', ''],
-      ['Over Time Pay', '₹0', '', ''],
-      ['Total Earnings', `₹${(parseFloat(report.basicSalary || 0) + parseFloat(report.allowances || 0)).toFixed(2)}`, 'Total Deductions', `₹${getDeductionAmount(report.deductions).toFixed(2)}`]
-    ];
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-
-    tableData.forEach((row, index) => {
-      yPos += 8;
-
-      // Draw cell borders
-      doc.rect(15, yPos, 45, 8);
-      doc.rect(60, yPos, 45, 8);
-      doc.rect(105, yPos, 45, 8);
-      doc.rect(150, yPos, 45, 8);
-
-      // Add text
-      if (index === tableData.length - 1) {
-        doc.setFont("helvetica", "bold");
-      }
-
-      doc.text(row[0], 17, yPos + 5);
-      doc.text(row[1], 62, yPos + 5);
-      doc.text(row[2], 107, yPos + 5);
-      doc.text(row[3], 152, yPos + 5);
-
-      if (index === tableData.length - 1) {
-        doc.setFont("helvetica", "normal");
-      }
-    });
-
-    // Net Pay Section
-    yPos += 15;
-    const netPay = parseFloat(report.totalAmount || 0);
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.text(`Net Pay : ₹${netPay.toFixed(2)}`, 37.5, yPos + 5, null, null, "center");
-    doc.text(`In Words : ${convertNumberToWords(netPay)} Rupees Only`, 62, yPos + 5);
-
-    yPos += 20;
-    yPos = drawSignatureSection(doc, yPos, report);
-  };
 
   const generatePDF = async (report) => {
     const doc = new jsPDF();

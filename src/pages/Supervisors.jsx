@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, deleteDoc, setDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import {
   UserPlusIcon,
@@ -46,7 +46,7 @@ export default function Supervisors() {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [locationSupervisor, setLocationSupervisor] = useState(null);
   const [companies, setCompanies] = useState([]);
-  const [loadingCompanies, setLoadingCompanies] = useState(true);
+
 
   const [notification, setNotification] = useState({
     show: false,
@@ -93,11 +93,11 @@ export default function Supervisors() {
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setCompanies(data);
-        setLoadingCompanies(false);
+
       },
       (error) => {
         console.error('Error fetching companies:', error);
-        setLoadingCompanies(false);
+
       }
     );
 
@@ -296,7 +296,7 @@ export default function Supervisors() {
   // 🔹 Activate / Deactivate Supervisor
   const handleToggleSupervisorStatus = async (supervisor) => {
     const isDeactivating = supervisor.status === 'active';
-    const action = isDeactivating ? 'Deactivate' : 'Activate';
+
 
     const confirmMsg = isDeactivating
       ? `Are you sure you want to deactivate ${supervisor.name}?\n\n⚠️ This will immediately log them out and block login access.`

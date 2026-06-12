@@ -2,28 +2,23 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  HomeIcon,
-  ShieldCheckIcon,
   UsersIcon,
   UserGroupIcon,
   BuildingOfficeIcon,
-  ClockIcon,
   CalendarDaysIcon,
   ChartBarIcon,
   CalculatorIcon,
-  ArrowRightOnRectangleIcon,
   DocumentTextIcon,
   GiftIcon,
   Cog6ToothIcon,
   BanknotesIcon,
   CalendarIcon
 } from '@heroicons/react/24/outline';
-import { useAuth } from '../../contexts/AuthContext';
+
 import { companyData } from '../../data/companyData';
 import jmsLogo from '../../assets/logos/AP logo.jpg';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-  const { user, logout } = useAuth();
 
   // Use the first company from static companyData (Jay Maharashtra Security)
   const currentCompany = companyData["jay-maharashtra-security"];
@@ -43,11 +38,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { name: 'Settings', path: '/settings', icon: Cog6ToothIcon },
   ];
 
-  const handleLogout = () => {
-    logout();
-    // Optionally redirect to login page
-    window.location.href = '/login';
-  };
+
 
   return (
     <>

@@ -193,6 +193,7 @@ const AttendanceReport = () => {
       setLoading(false);
     };
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getTodaysDate = () => new Date().toISOString().split("T")[0];
@@ -491,6 +492,7 @@ const AttendanceReport = () => {
   const totalCalculatedDays = useMemo(() => {
     if (!attendanceData.length) return 0;
     return attendanceData.reduce((sum, record) => sum + computeDayValue(record), 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attendanceData, companies]);
 
   const dayBreakdownSummary = useMemo(() => {
@@ -535,6 +537,7 @@ const AttendanceReport = () => {
       overtimeDays,
       halfDays,
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attendanceData, companies]);
 
   const selectedShiftHoursLabel = useMemo(() => {
@@ -561,6 +564,7 @@ const AttendanceReport = () => {
     }
 
     return "N/A";
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewMode, selectedCompany, companies, attendanceData]);
 
   // UI

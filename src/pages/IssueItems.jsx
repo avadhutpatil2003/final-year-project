@@ -109,6 +109,7 @@ const IssueItems = () => {
 
     fetchItemsList();
     fetchIssuedData();
+    return () => unsubscribe();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

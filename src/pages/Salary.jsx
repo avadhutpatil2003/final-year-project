@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import {
@@ -83,11 +83,7 @@ export default function Salary() {
     };
   }, []);
 
-  // 🔹 Salary statistics
-  const salaryStats = useMemo(() => ({
-    total: salaries.length,
-    totalAmount: salaries.reduce((sum, salary) => sum + (parseFloat(salary.totalSalary) || 0), 0)
-  }), [salaries]);
+
 
   // 🔹 Add or update salary
   const handleAddSalary = async (newSalary) => {

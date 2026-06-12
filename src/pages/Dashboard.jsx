@@ -4,7 +4,7 @@ import { db } from "../firebase";
 import StatCard from "../components/CardStats/StatCard";
 import DataTable from "../components/Table/DataTable";
 import AnimatedCounter from "../components/widgets/AnimatedCounter";
-import useRealTimeData from "../hooks/useRealTimeData";
+
 import { useNavigate } from "react-router-dom";
 import {
   BuildingOfficeIcon,
@@ -25,32 +25,10 @@ const Dashboard = () => {
   const [recentCompanies, setRecentCompanies] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
 
-  // Memoize initial data to prevent infinite re-renders
-  const initialStatsData = useMemo(() => ({
-    totalCompanies: companies.length,
-    activeCompanies: companies.filter((c) => c.status === "on_duty").length,
-    totalEmployees: employees.length,
-    presentEmployees: employees.filter((e) => e.status === "present").length,
-    absentEmployees: employees.filter((e) => e.status === "absent").length,
-    totalShifts: 156,
-    completedShifts: 142,
-    attendanceRate:
-      employees.length > 0
-        ? (
-            (employees.filter((e) => e.status === "present").length /
-              employees.length) *
-            100
-          ).toFixed(1)
-        : 0,
-    incidentReports: 3,
-    stockAlerts: 2,
-    monthlyHours: 3240,
-  }), [companies, employees]);
+
 
   // Real-time data hooks (keeping for other stats)
-  const {
-    data: stats,
-  } = useRealTimeData(initialStatsData, 5000);
+
 
   useEffect(() => {
     const fetchInitialData = async () => {

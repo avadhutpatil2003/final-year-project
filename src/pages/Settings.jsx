@@ -5,8 +5,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const Settings = () => {
-  // Auto refresh is always enabled at 60 seconds
-  const refreshInterval = 60;
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">

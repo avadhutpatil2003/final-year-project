@@ -92,7 +92,7 @@ const AddSupervisorForm = ({ onAdd, onCancel, initialData }) => {
   }, [initialData]);
 
   const handleChange = (e) => {
-    const { id, value, type } = e.target;
+    const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 

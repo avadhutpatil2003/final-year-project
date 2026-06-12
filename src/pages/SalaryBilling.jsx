@@ -28,7 +28,7 @@ import {
 import { format, getDaysInMonth } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
-import { createNewCollection } from "../firebaseOperations";
+
 import { getCompanyOptions, getCompanyById } from "../data/companyData";
 import { createDeductionNotifications } from "../utils/notificationService";
 import Toast from "../components/Toast";
@@ -89,9 +89,9 @@ const convertNumberToWords = (num) => {
 
 const SalaryBilling = () => {
   const navigate = useNavigate();
-  const { updateAdvanceData, clearAdvanceData, updateDeductionData } = useAdvance();
+  const { clearAdvanceData } = useAdvance();
   const [employees, setEmployees] = useState([]);
-  const [attendanceData, setAttendanceData] = useState([]);
+
   const [formData, setFormData] = useState({
     employeeId: "",
     employeeName: "",
@@ -155,12 +155,12 @@ const SalaryBilling = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [employeesLoading, setEmployeesLoading] = useState(true);
-  const [attendanceLoading, setAttendanceLoading] = useState(false);
+
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
   const [generatedBill, setGeneratedBill] = useState(null);
-  const [employeeAdvance, setEmployeeAdvance] = useState(0);
+
   const [employeeIssuedItems, setEmployeeIssuedItems] = useState([]);
-  const [originalAdvance, setOriginalAdvance] = useState(0);
+
   const [originalShoesAmount, setOriginalShoesAmount] = useState(0);
   const [originalUniformAmount, setOriginalUniformAmount] = useState(0);
   const [preparedBy, setPreparedBy] = useState('');
@@ -320,7 +320,9 @@ const SalaryBilling = () => {
       fetchAttendanceData();
       fetchEmployeeAdvanceAndItems();
       fetchBillingData(); // 🔥 AUTOMATICALLY FETCH AND SAVE SALARY DATA
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.employeeId, formData.month, formData.year]);
 
   // 🔔 Check for recently cleared advances on page load
@@ -409,6 +411,7 @@ const SalaryBilling = () => {
 
     // Run once on page load
     checkRecentlyClearedAdvances();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array - runs once on mount
 
 
@@ -534,14 +537,7 @@ const SalaryBilling = () => {
     }
   };
 
-  // Fetch previous advance deductions from salary reports (backward compatibility)
-  const fetchPreviousAdvanceDeductions = async (employeeId) => {
-    const result = await fetchPreviousDeductions(employeeId);
-    return {
-      totalPreviousDeductions: result.totalPreviousAdvanceDeductions,
-      deductionHistory: result.deductionHistory
-    };
-  };
+
 
   // Fetch employee advance and issued items
   const fetchEmployeeAdvanceAndItems = async () => {
@@ -614,8 +610,7 @@ const SalaryBilling = () => {
       // ❌ NO calculation needed - remainingAfterDeduction already in advance_deduction_history
       // Direct values from database
 
-      setOriginalAdvance(totalOriginalAdvance); // Store original advance
-      setEmployeeAdvance(totalAdvance); // Store remaining advance (already calculated in DB)
+
 
       // Calculate previous deductions (original - remaining)
       const calculatedPreviousDeductions = totalOriginalAdvance - totalAdvance;
@@ -756,7 +751,7 @@ const SalaryBilling = () => {
     } catch (error) {
       console.error("❌ Error fetching employee data:", error);
       // Set default values on error
-      setEmployeeAdvance(0);
+
       setEmployeeIssuedItems([]);
     }
   };
@@ -1108,7 +1103,7 @@ const SalaryBilling = () => {
     if (!formData.employeeId || !formData.month || !formData.year) return;
 
     try {
-      setAttendanceLoading(true);
+
       console.log("📊 Fetching attendance data for employee:", formData.employeeId);
 
       // First fetch billing data
@@ -1173,7 +1168,7 @@ const SalaryBilling = () => {
       console.log("🧮 Calculated total working hours:", totalWorkingHours);
       console.log("📅 Present days:", presentDays);
 
-      setAttendanceData(attendanceList);
+
 
       // Calculate salary based on hourly rate and working hours
       const employeeForSalary = employees.find(emp => emp.id === formData.employeeId);
@@ -1201,7 +1196,7 @@ const SalaryBilling = () => {
       console.error("❌ Error fetching attendance data:", err);
       setError(`Failed to load attendance data: ${err.message}`);
     } finally {
-      setAttendanceLoading(false);
+
     }
   };
 
@@ -1304,8 +1299,7 @@ const SalaryBilling = () => {
 
     // Clear previous employee data
     console.log("🧹 Clearing previous employee data...");
-    setOriginalAdvance(0);
-    setEmployeeAdvance(0);
+
     setOriginalShoesAmount(0);
     setOriginalUniformAmount(0);
     setEmployeeIssuedItems([]);
@@ -1428,26 +1422,7 @@ const SalaryBilling = () => {
     return (totalEarnings - totalDeductions).toFixed(2);
   };
 
-  // Function to create new collection in Firebase
-  const createNewFirebaseCollection = async (collectionName, sampleData) => {
-    try {
-      setLoading(true);
-      const result = await createNewCollection(collectionName, sampleData);
 
-      if (result.success) {
-        setSuccess(true);
-        setError("");
-        console.log(`✅ New collection '${collectionName}' created with ID: ${result.id}`);
-        alert(`नया collection '${collectionName}' successfully बना दिया गया! Document ID: ${result.id}`);
-      } else {
-        setError(`Error creating collection: ${result.error}`);
-      }
-    } catch (error) {
-      setError(`Error: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Function to update issuedItems collection with deductions
   const updateIssuedItemsWithDeductions = async (employeeId, deductions) => {
@@ -1590,128 +1565,7 @@ const SalaryBilling = () => {
     }
   };
 
-  // Function to update employee remaining balances after salary processing
-  const updateEmployeeRemainingBalances = async (employeeId, deductions) => {
-    try {
-      console.log("💰 Updating employee remaining balances...");
-      console.log("- Employee ID:", employeeId);
-      console.log("- Deductions:", deductions);
 
-      const employeeForUpdate = employees.find(emp => emp.id === employeeId);
-      if (!employeeForUpdate) {
-        console.error("❌ Employee not found for balance update");
-        return;
-      }
-
-      // Calculate new remaining amounts
-      const currentShoesRemaining = parseFloat(employeeForUpdate.shoesRemaining || employeeForUpdate.shoesAmount || originalShoesAmount || 0);
-      const currentUniformRemaining = parseFloat(employeeForUpdate.uniformRemaining || employeeForUpdate.uniformAmount || originalUniformAmount || 0);
-      const currentAdvanceRemaining = parseFloat(employeeForUpdate.advanceRemaining || employeeForUpdate.advanceAmount || employeeForUpdate.advance || 0);
-
-      const newShoesRemaining = Math.max(0, currentShoesRemaining - deductions.shoesDeduction);
-      const newUniformRemaining = Math.max(0, currentUniformRemaining - deductions.uniformDeduction);
-      const newAdvanceRemaining = Math.max(0, currentAdvanceRemaining - deductions.advanceDeduction);
-
-      console.log("📊 Balance calculations:");
-      console.log("- Shoes: ₹", currentShoesRemaining, "- ₹", deductions.shoesDeduction, "= ₹", newShoesRemaining);
-      console.log("- Uniform: ₹", currentUniformRemaining, "- ₹", deductions.uniformDeduction, "= ₹", newUniformRemaining);
-      console.log("- Advance: ₹", currentAdvanceRemaining, "- ₹", deductions.advanceDeduction, "= ₹", newAdvanceRemaining);
-
-      // Log when amounts become zero
-      if (newShoesRemaining === 0) console.log("🎯 Shoes fully paid off! Setting original amount to 0");
-      if (newUniformRemaining === 0) console.log("🎯 Uniform fully paid off! Setting original amount to 0");
-      if (newAdvanceRemaining === 0) console.log("🎯 Advance fully paid off! Setting original amount to 0");
-
-      // 🔔 Create notifications for cleared deductions
-      console.log('🔍 CHECKING for cleared deductions:');
-      console.log('  - Advance:', { currentAdvanceRemaining, newAdvanceRemaining, willClear: currentAdvanceRemaining > 0 && newAdvanceRemaining === 0 });
-      console.log('  - Uniform:', { currentUniformRemaining, newUniformRemaining, willClear: currentUniformRemaining > 0 && newUniformRemaining === 0 });
-      console.log('  - Shoes:', { currentShoesRemaining, newShoesRemaining, willClear: currentShoesRemaining > 0 && newShoesRemaining === 0 });
-
-      await createDeductionNotifications(
-        {
-          advanceCleared: currentAdvanceRemaining > 0 && newAdvanceRemaining === 0,
-          uniformCleared: currentUniformRemaining > 0 && newUniformRemaining === 0,
-          shoesCleared: currentShoesRemaining > 0 && newShoesRemaining === 0
-        },
-        employeeId,
-        employeeForUpdate.name || formData.employeeName
-      );
-
-      // 🎉 Show toast notifications for cleared deductions
-      if (currentAdvanceRemaining > 0 && newAdvanceRemaining === 0) {
-        setToastMessage(`✅ ${employeeForUpdate.name || formData.employeeName}'s advance has been fully cleared! Remaining: ₹0`);
-        setToastType('success');
-        setShowToast(true);
-        console.log('🎉 TOAST: Advance cleared!');
-      }
-
-      if (currentUniformRemaining > 0 && newUniformRemaining === 0) {
-        setToastMessage(`✅ ${employeeForUpdate.name || formData.employeeName}'s uniform deduction has been fully cleared! Remaining: ₹0`);
-        setToastType('success');
-        setShowToast(true);
-        console.log('🎉 TOAST: Uniform cleared!');
-      }
-
-      if (currentShoesRemaining > 0 && newShoesRemaining === 0) {
-        setToastMessage(`✅ ${employeeForUpdate.name || formData.employeeName}'s shoes deduction has been fully cleared! Remaining: ₹0`);
-        setToastType('success');
-        setShowToast(true);
-        console.log('🎉 TOAST: Shoes cleared!');
-      }
-
-
-      // Update employee document with new remaining amounts
-      const employeeDocRef = doc(db, "employees", employeeId);
-      await setDoc(employeeDocRef, {
-        ...employeeForUpdate,
-        shoesRemaining: newShoesRemaining,
-        uniformRemaining: newUniformRemaining,
-        advanceRemaining: newAdvanceRemaining,
-        // When remaining becomes 0, also set original amounts to 0
-        shoesAmount: newShoesRemaining === 0 ? 0 : employeeForUpdate.shoesAmount,
-        uniformAmount: newUniformRemaining === 0 ? 0 : employeeForUpdate.uniformAmount,
-        advanceAmount: newAdvanceRemaining === 0 ? 0 : (employeeForUpdate.advanceAmount || employeeForUpdate.advance),
-        advance: newAdvanceRemaining === 0 ? 0 : employeeForUpdate.advance,
-        // Keep track of total deductions
-        totalShoesDeducted: (parseFloat(employeeForUpdate.totalShoesDeducted || 0) + deductions.shoesDeduction),
-        totalUniformDeducted: (parseFloat(employeeForUpdate.totalUniformDeducted || 0) + deductions.uniformDeduction),
-        totalAdvanceDeducted: (parseFloat(employeeForUpdate.totalAdvanceDeducted || 0) + deductions.advanceDeduction),
-        lastSalaryProcessed: new Date().toISOString(),
-        updatedAt: new Date()
-      });
-
-      // Update local state
-      setEmployees(prevEmployees =>
-        prevEmployees.map(emp =>
-          emp.id === employeeId
-            ? {
-              ...emp,
-              shoesRemaining: newShoesRemaining,
-              uniformRemaining: newUniformRemaining,
-              advanceRemaining: newAdvanceRemaining,
-              // When remaining becomes 0, also set original amounts to 0
-              shoesAmount: newShoesRemaining === 0 ? 0 : emp.shoesAmount,
-              uniformAmount: newUniformRemaining === 0 ? 0 : emp.uniformAmount,
-              advanceAmount: newAdvanceRemaining === 0 ? 0 : (emp.advanceAmount || emp.advance),
-              advance: newAdvanceRemaining === 0 ? 0 : emp.advance,
-              totalShoesDeducted: (parseFloat(emp.totalShoesDeducted || 0) + deductions.shoesDeduction),
-              totalUniformDeducted: (parseFloat(emp.totalUniformDeducted || 0) + deductions.uniformDeduction),
-              totalAdvanceDeducted: (parseFloat(emp.totalAdvanceDeducted || 0) + deductions.advanceDeduction)
-            }
-            : emp
-        )
-      );
-
-      // Update display amounts
-      setOriginalShoesAmount(newShoesRemaining);
-      setOriginalUniformAmount(newUniformRemaining);
-
-      console.log("✅ Employee remaining balances updated successfully");
-    } catch (error) {
-      console.error("❌ Error updating employee remaining balances:", error);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -2053,6 +1907,7 @@ const SalaryBilling = () => {
 
   const totalAmount = useMemo(() => {
     return calculateTotal();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     formData.basicSalary,
     formData.calculatedSalary,

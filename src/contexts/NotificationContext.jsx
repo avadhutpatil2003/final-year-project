@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, query, where, getDocs, updateDoc, doc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { collection, query, getDocs, updateDoc, doc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
 const NotificationContext = createContext();

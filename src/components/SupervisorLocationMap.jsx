@@ -46,9 +46,7 @@ const AutoFitBounds = ({ locations }) => {
 const SupervisorLocationMap = ({ supervisorEmail, live = true }) => {
   const [locations, setLocations] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [loading, setLoading] = useState(false);
   const [isLiveMode, setIsLiveMode] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -256,7 +254,6 @@ const SupervisorLocationMap = ({ supervisorEmail, live = true }) => {
       console.log(`✅ Found ${validPoints.length} valid location points`);
 
       setLocations(validPoints);
-      setLastUpdate(new Date());
 
       // Update map with locations if using Google Maps
       if (USE_GOOGLE_MAPS && validPoints.length > 0) {
@@ -267,6 +264,7 @@ const SupervisorLocationMap = ({ supervisorEmail, live = true }) => {
     return () => {
       unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supervisorEmail, selectedDate, mapLoaded]);
 
   const initializeMap = () => {
@@ -572,14 +570,6 @@ const SupervisorLocationMap = ({ supervisorEmail, live = true }) => {
           </div>
         )}
 
-        {loading && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-sm text-gray-600">Loading locations...</p>
-            </div>
-          </div>
-        )}
 
         {/* Live badges */}
         {isLiveMode && mapLoaded && (
@@ -715,7 +705,7 @@ const SupervisorLocationMap = ({ supervisorEmail, live = true }) => {
       </div>
 
       {/* Location summary and stats */}
-      {!loading && locations.length > 0 && (
+      {locations.length > 0 && (
         <div className="mt-4 space-y-3">
           {/* Date and count info */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -783,7 +773,7 @@ const SupervisorLocationMap = ({ supervisorEmail, live = true }) => {
       )}
 
       {/* No Data Message */}
-      {!loading && locations.length === 0 && (
+      {locations.length === 0 && (
         <div className="text-center py-4 text-gray-500 text-sm flex items-center justify-center gap-2">
           <MapPinIcon className="h-5 w-5 text-gray-400" />
           <span>No live location data for {selectedDate}</span>
