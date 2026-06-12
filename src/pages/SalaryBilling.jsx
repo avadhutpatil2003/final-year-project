@@ -2753,7 +2753,8 @@ const SalaryBilling = () => {
                   {filteredEmployees.map((employee) => (
                     <div
                       key={employee.id}
-                      onClick={() => {
+                      onMouseDown={(e) => {
+                        e.preventDefault();
                         setEmployeeSearchTerm(employee.name);
                         setShowEmployeeDropdown(false);
                         handleEmployeeSelect({ target: { value: employee.id, name: 'employeeId' } });

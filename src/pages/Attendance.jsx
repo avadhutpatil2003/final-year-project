@@ -619,7 +619,8 @@ const AttendanceReport = () => {
                 {filteredCompanies.map((c) => (
                   <div
                     key={c.id}
-                    onClick={() => {
+                    onMouseDown={(e) => {
+                      e.preventDefault();
                       const companyName = c.name || c.companyName;
                       setCompanySearchTerm(companyName);
                       setSelectedCompany(companyName);
@@ -667,7 +668,8 @@ const AttendanceReport = () => {
                 {filteredEmployees.map((emp) => (
                   <div
                     key={emp.id}
-                    onClick={() => {
+                    onMouseDown={(e) => {
+                      e.preventDefault();
                       const empName = emp.name || emp.employeeName;
                       setEmployeeSearchTerm(empName);
                       setSelectedEmployee(empName);

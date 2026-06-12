@@ -545,7 +545,8 @@ export default function AdvanceManagement() {
                 {filteredEmployees.map((emp) => (
                   <div
                     key={emp.id}
-                    onClick={() => {
+                    onMouseDown={(e) => {
+                      e.preventDefault();
                       setEmployeeSearchTerm(emp.name);
                       setShowEmployeeDropdown(false);
                       setFormData({

@@ -6,15 +6,20 @@ import DataTable from "../components/Table/DataTable";
 import AnimatedCounter from "../components/widgets/AnimatedCounter";
 import useRealTimeData from "../hooks/useRealTimeData";
 import SupervisorLocationMap from "../components/SupervisorLocationMap";
+import { useNavigate } from "react-router-dom";
 import {
   BuildingOfficeIcon,
   UserGroupIcon,
   CheckCircleIcon,
   XCircleIcon,
   MapPinIcon,
+  DocumentTextIcon,
+  BanknotesIcon,
+  BriefcaseIcon
 } from "@heroicons/react/24/outline";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
@@ -308,8 +313,56 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="px-6 py-4 space-y-6">
-      {/* Header with Live Controls */}
+    <div className="px-6 py-6 space-y-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Security Dashboard</h1>
+          <p className="text-sm text-gray-600 mt-1">Overview of your workforce, daily attendance, and operations</p>
+        </div>
+        <div className="mt-4 md:mt-0 flex items-center space-x-2 text-sm text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 font-medium">
+          <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span>Live Updates Active</span>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+          <BuildingOfficeIcon className="h-5 w-5 text-blue-500" />
+          <span>Quick Actions</span>
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <button
+            onClick={() => navigate('/mark-attendance')}
+            className="p-4 bg-blue-50 rounded-xl border border-blue-100 hover:bg-blue-100 hover:shadow-md transition-all flex flex-col items-center justify-center text-center space-y-2 cursor-pointer group"
+          >
+            <CheckCircleIcon className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-semibold text-gray-800">Mark Attendance</span>
+          </button>
+          <button
+            onClick={() => navigate('/salary-billing')}
+            className="p-4 bg-green-50 rounded-xl border border-green-100 hover:bg-green-100 hover:shadow-md transition-all flex flex-col items-center justify-center text-center space-y-2 cursor-pointer group"
+          >
+            <DocumentTextIcon className="h-8 w-8 text-green-600 group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-semibold text-gray-800">Salary Billing</span>
+          </button>
+          <button
+            onClick={() => navigate('/advance-management')}
+            className="p-4 bg-orange-50 rounded-xl border border-orange-100 hover:bg-orange-100 hover:shadow-md transition-all flex flex-col items-center justify-center text-center space-y-2 cursor-pointer group"
+          >
+            <BanknotesIcon className="h-8 w-8 text-orange-600 group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-semibold text-gray-800">Give Advance</span>
+          </button>
+          <button
+            onClick={() => navigate('/issue-items')}
+            className="p-4 bg-purple-50 rounded-xl border border-purple-100 hover:bg-purple-100 hover:shadow-md transition-all flex flex-col items-center justify-center text-center space-y-2 cursor-pointer group"
+          >
+            <BriefcaseIcon className="h-8 w-8 text-purple-600 group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-semibold text-gray-800">Issue Items</span>
+          </button>
+        </div>
+      </div>
 
       {/* Stats Cards Row: Total Companies, Total Employees, Present, Absent */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -433,40 +486,96 @@ const Dashboard = () => {
         </div>
       )}
 
-        {/* Supervisor Location Tracking with Map */}
-        <div className="card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            <div className="flex items-center space-x-2">
-              <MapPinIcon className="h-5 w-5 text-blue-500" />
-              <span>Supervisor Location Tracking</span>
+      {/* Default view when no summary is selected */}
+      {!selectedSummary && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Attendance */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center">
+              <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
+              Recent Attendance
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="text-xs text-gray-500 uppercase bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 rounded-l-md font-semibold">Employee</th>
+                    <th className="px-4 py-2 text-center rounded-r-md font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {attendanceData.slice(0, 5).map((rec, idx) => (
+                    <tr key={rec.id || idx} className="border-b last:border-0 border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 font-medium text-gray-900">{rec.employeeName || rec.name || 'Unknown'}</td>
+                      <td className="px-4 py-3 text-center">
+                        <span className="inline-block px-2 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">
+                          Present
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {attendanceData.length === 0 && (
+                    <tr>
+                      <td colSpan="2" className="px-4 py-6 text-center text-gray-500">No attendance records for today</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
-            <span className="text-xs text-gray-500">Live tracking with date-wise history</span>
-          </h3>
-          
-          <div className="space-y-4">
-            {/* Supervisor Selector */}
-            <select
-              value={selectedSupervisor}
-              onChange={(e) => setSelectedSupervisor(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select Supervisor</option>
-              {supervisors.map((supervisor) => (
-                <option key={supervisor.id} value={supervisor.id}>
-                  {supervisor.name}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 -mt-2">Select a supervisor to load live pins. The map remains visible for quick context.</p>
+            {attendanceData.length > 5 && (
+              <div className="mt-4 text-center">
+                <button 
+                  onClick={() => setSelectedSummary('present')}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                >
+                  View All Present ({headerAttendanceStats.presentCount})
+                </button>
+              </div>
+            )}
+          </div>
 
-            {/* Map Component */}
-            <SupervisorLocationMap
-              supervisorEmail={
-                supervisors.find((s) => s.id === selectedSupervisor)?.email || selectedSupervisor || ""
-              }
-            />
+          {/* Recent Companies / Active Overview */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center">
+              <BuildingOfficeIcon className="h-5 w-5 text-blue-500 mr-2" />
+              Active Companies Overview
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="text-xs text-gray-500 uppercase bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 rounded-l-md font-semibold">Company</th>
+                    <th className="px-4 py-2 text-right rounded-r-md font-semibold">Location</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentCompanies.slice(0, 5).map((comp, idx) => (
+                    <tr key={comp.id || idx} className="border-b last:border-0 border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 font-medium text-gray-900">{comp.name}</td>
+                      <td className="px-4 py-3 text-right text-gray-500 text-xs">{comp.location || comp["company location"] || "Not specified"}</td>
+                    </tr>
+                  ))}
+                  {recentCompanies.length === 0 && (
+                    <tr>
+                      <td colSpan="2" className="px-4 py-6 text-center text-gray-500">No active companies found</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {recentCompanies.length > 5 && (
+              <div className="mt-4 text-center">
+                <button 
+                  onClick={() => setSelectedSummary('companies')}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                >
+                  View All Companies ({companies.length})
+                </button>
+              </div>
+            )}
           </div>
         </div>
+      )}
 
     </div>
   );
